@@ -16,14 +16,14 @@ import threading
 # TODO Lateral LAN and VLAN Crawling   
 # TODO Log identified box
 # TODO port scan identified boxs 
+# TODO Store returned port data into data frame 
 
-def netcat(hn,p):
+def netcat(targetAddr,targetPort,content):
     # create connection over tcp 
     sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     try:
-        sock.connect((hn,p))
+        sock.connect((targetAddr,targetPort))
         #send all content over the socket 
-        content = bytes("", "UTF-8")
         sock.sendall(content)
         time.sleep(.5)
         sock.shutdown(socket.SHUT_WR)
@@ -38,14 +38,14 @@ def netcat(hn,p):
                     break
                 serResponce = data.decode()
             except:
-                print("No Resonce on Port: " + str(p))
+                print("No Resonce on Port: " + str(targetPort))
                 break
 
         if (serResponce):
             print("server responce: " + serResponce)
         sock.close()
     except:
-        print("Connection Refused on port" + str(p))
+        print("Connection Refused on port" + str(targetPort))
         pass
 
 def print_recv(sock, event):
@@ -63,26 +63,15 @@ def print_recv(sock, event):
 # main fucntion configure ports and scan
 def main(): 
     targetAddr = "192.168.1.237"
-    targetPort = 22
+    targetPort = 8000
+    content = bytes("", "UTF-8")
 
-    while (targetPort):
-        netcat(targetAddr,targetPort)
+    while (targetPort<8001):
+        content = bytes("", "UTF-8")
+        content2 = bytes("HEAD / HTTP/1.1\nHost:" + str(targetAddr) +"\n" +"END\nHTTP/1.0 200 OK\n", "UTF-8")
+        netcat(targetAddr,targetPort,content2)
         targetPort+=1
-
 
 if __name__ == "__main__":
     # execute only if run as a script
     main()
-
-# i = 0
-# while (i < 23):
-#     netcat(targetAddr,i,content)
-#     i+=1
-
- # commands to hit with bash scripts 
- 
- # Active service 
-    # systemctl list-units --type=service
-
-    # Net Cat 
-    # nc -v -n 8.8.8.8 1-1000
