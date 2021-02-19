@@ -9,7 +9,7 @@ import pandas as pd
 import threading
 import subprocess
 from nmap import nmap
-
+import fileinput
 
 
 # TODO Build Loop for all comon Ports then random ports 
@@ -65,12 +65,40 @@ def readReport(args):
     df = pd.read_csv(str(args), header=None)
     print(df)
 
+def parseReport(file,searchExp):
+    file = open(file, "r")
+    lines = file.readlines()
+
+    for line in lines:
+        if searchExp in line:
+            print(line)
+            line = line.replace(searchExp,line + ",")
+            sys.stdout.write(line)
+
+# replaceAll("/fooBar.txt","Hello\sWorld!$","Goodbye\sWorld.")
+def addCommas(file,searchExp,replaceExp):
+    for line in fileinput.input(file, inplace=1):
+        if searchExp in line:
+            line = line.replace(searchExp,line + replaceExp)
+        sys.stdout.write(line)
+
+def replaceAll(file,searchExp,replaceExp):
+    for line in fileinput.input(file, inplace=1):
+        if searchExp in line:
+            print(line)
+            #line = line.replace(searchExp,replaceExp)
+            #sys.stdout.write(line)
+
 # main fucntion configure ports and scan
 def main(): 
     # netcatInit()
     file = "report.csv"
+    re = "Nmap scan report for"
     # nmap(file)
-    readReport(file)
+    # readReport(file)
+    # addCommas(file, re, ",")
+    #replaceAll(file,re, "")
+    parseReport(file,re)
 
     
 if __name__ == "__main__":
