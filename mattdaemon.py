@@ -2,12 +2,14 @@
 # graciously barrowed 
 # https://www.instructables.com/Netcat-in-Python/
 
-
 import sys
 import socket
 import time
 import pandas as pd 
 import threading
+import subprocess
+from nmap import nmap
+
 
 
 # TODO Build Loop for all comon Ports then random ports 
@@ -48,30 +50,29 @@ def netcat(targetAddr,targetPort,content):
         print("Connection Refused on port" + str(targetPort))
         pass
 
-def print_recv(sock, event):
-    while not event.is_set():
-        try:
-            msg = sock.recv(4096)
-        except socket.timeout:
-            pass
-        else:
-            if not msg:
-                break
-            sys.stdout.write(msg)
-            sys.stdout.flush()
+def netcatInit():
+    targetAddr = "192.168.1.237"
+    targetPort = 22
+    content = bytes("", "UTF-8")
+
+    while (targetPort<25):
+        content = bytes("", "UTF-8")   
+        contentHTTP = bytes("HEAD / HTTP/1.1\nHost:" + str(targetAddr) +"\n" +"END\nHTTP/1.0 200 OK\n", "UTF-8")
+        netcat(targetAddr,targetPort,content)
+        targetPort+=1
+
+def readReport(args):
+    df = pd.read_csv(str(args), header=None)
+    print(df)
 
 # main fucntion configure ports and scan
 def main(): 
-    targetAddr = "192.168.1.237"
-    targetPort = 8000
-    content = bytes("", "UTF-8")
+    # netcatInit()
+    file = "report.csv"
+    # nmap(file)
+    readReport(file)
 
-    while (targetPort<8001):
-        content = bytes("", "UTF-8")
-        content2 = bytes("HEAD / HTTP/1.1\nHost:" + str(targetAddr) +"\n" +"END\nHTTP/1.0 200 OK\n", "UTF-8")
-        netcat(targetAddr,targetPort,content2)
-        targetPort+=1
-
+    
 if __name__ == "__main__":
     # execute only if run as a script
     main()

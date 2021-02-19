@@ -1,3 +1,9 @@
+import subprocess
+result = subprocess.run(['nmap', '192.168.1.168'], stdout=subprocess.PIPE)
+result.stdout
+print(result)
+
+
 
 # netcat 192.168.1.237 8000 <<END
 # HEAD / HTTP/1.1
@@ -22,3 +28,6 @@
 
     # Net Cat 
     # nc -v -n 8.8.8.8 1-1000
+
+
+
